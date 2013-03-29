@@ -110,12 +110,17 @@ static dispatch_queue_t json_request_operation_processing_queue() {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Warc-retain-cycles"
     self.completionBlock = ^ {
+        
+        dispatch_group_t dispatchGroup = dispatch_group_create();
+        dispatch_group_enter(dispatchGroup);
+        
         if (self.error) {
             if (failure) {
                 dispatch_async(self.failureCallbackQueue ?: dispatch_get_main_queue(), ^{
                     failure(self, self.error);
                 });
             }
+            dispatch_group_leave(dispatchGroup);
         } else {
             dispatch_async(json_request_operation_processing_queue(), ^{
                 id JSON = self.responseJSON;
@@ -133,8 +138,15 @@ static dispatch_queue_t json_request_operation_processing_queue() {
                         });
                     }
                 }
+                dispatch_group_leave(dispatchGroup);
             });
         }
+        
+        while(dispatch_group_wait(dispatchGroup, DISPATCH_TIME_NOW)){
+            [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
+                                     beforeDate:[NSDate dateWithTimeIntervalSinceNow:0.1f]];
+        }
+        
     };
 #pragma clang diagnostic pop
 }
