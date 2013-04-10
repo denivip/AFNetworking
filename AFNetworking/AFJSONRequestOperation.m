@@ -147,6 +147,7 @@ static dispatch_queue_t json_request_operation_processing_queue() {
                                      beforeDate:[NSDate dateWithTimeIntervalSinceNow:0.1f]];
         }
         
+        dispatch_release(dispatchGroup);
     };
 #pragma clang diagnostic pop
 }
