@@ -146,8 +146,6 @@ static dispatch_queue_t json_request_operation_processing_queue() {
             [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
                                      beforeDate:[NSDate dateWithTimeIntervalSinceNow:0.1f]];
         }
-        
-        dispatch_release(dispatchGroup);
     };
 #pragma clang diagnostic pop
 }
