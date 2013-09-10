@@ -230,6 +230,8 @@ typedef enum {
  @param header The HTTP header to set a default value for
  @param value The value set as default for the specified header, or `nil
  */
+@property (readwrite, nonatomic, strong) NSMutableDictionary *defaultHeaders;
+
 - (void)setDefaultHeader:(NSString *)header
                    value:(NSString *)value;
 
