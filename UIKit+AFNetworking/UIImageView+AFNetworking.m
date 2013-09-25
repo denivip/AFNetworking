@@ -71,6 +71,10 @@ static char kAFResponseSerializerKey;
         _af_imageCache = [[AFImageCache alloc] init];
     });
 
+    [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationDidReceiveMemoryWarningNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *note) {
+        [_af_imageCache removeAllObjects];
+    }];
+
     return _af_imageCache;
 }
 
