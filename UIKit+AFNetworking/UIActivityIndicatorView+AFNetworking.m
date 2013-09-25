@@ -40,17 +40,8 @@
             [self stopAnimating];
         }
 
-        NSOperationQueue *operationQueue = [NSOperationQueue mainQueue];
-
-        [notificationCenter addObserverForName:AFNetworkingOperationDidStartNotification object:operation queue:operationQueue usingBlock:^(NSNotification *notification) {
-            [self startAnimating];
-        }];
-
-        [notificationCenter addObserverForName:AFNetworkingOperationDidFinishNotification object:operation queue:operationQueue usingBlock:^(NSNotification *notification) {
-            [self stopAnimating];
-
-            [[NSNotificationCenter defaultCenter] removeObserver:self name:AFNetworkingTaskDidFinishNotification object:nil];
-        }];
+        [notificationCenter addObserver:self selector:@selector(startAnimating) name:AFNetworkingOperationDidStartNotification object:operation];
+        [notificationCenter addObserver:self selector:@selector(stopAnimating) name:AFNetworkingOperationDidFinishNotification object:operation];
     }
 }
 
@@ -68,21 +59,9 @@
             [self stopAnimating];
         }
 
-        NSOperationQueue *operationQueue = [NSOperationQueue mainQueue];
-
-        [notificationCenter addObserverForName:AFNetworkingTaskDidStartNotification object:task queue:operationQueue usingBlock:^(NSNotification *notification) {
-            [self startAnimating];
-        }];
-
-        [notificationCenter addObserverForName:AFNetworkingTaskDidFinishNotification object:task queue:operationQueue usingBlock:^(NSNotification *notification) {
-            [self stopAnimating];
-        }];
-
-        [notificationCenter addObserverForName:AFNetworkingTaskDidSuspendNotification object:task queue:operationQueue usingBlock:^(NSNotification *notification) {
-            [self stopAnimating];
-
-            [[NSNotificationCenter defaultCenter] removeObserver:self name:AFNetworkingTaskDidFinishNotification object:nil];
-        }];
+        [notificationCenter addObserver:self selector:@selector(startAnimating) name:AFNetworkingTaskDidStartNotification object:task];
+        [notificationCenter addObserver:self selector:@selector(stopAnimating) name:AFNetworkingTaskDidFinishNotification object:task];
+        [notificationCenter addObserver:self selector:@selector(stopAnimating) name:AFNetworkingTaskDidSuspendNotification object:task];
     }
 }
 
