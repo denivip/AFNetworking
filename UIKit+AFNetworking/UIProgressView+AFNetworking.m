@@ -114,15 +114,18 @@ static void * AFTaskCountOfBytesReceivedContext = &AFTaskCountOfBytesReceivedCon
             }
         } else if ([keyPath isEqualToString:@"state"]) {
             if ([object state] == NSURLSessionTaskStateCompleted) {
-                [object removeObserver:self forKeyPath:@"state"];
+                @try {
+                    [object removeObserver:self forKeyPath:@"state"];
 
-                if (context == AFTaskCountOfBytesSentContext) {
-                    [object removeObserver:self forKeyPath:@"countOfBytesSent"];
-                }
+                    if (context == AFTaskCountOfBytesSentContext) {
+                        [object removeObserver:self forKeyPath:@"countOfBytesSent"];
+                    }
 
-                if (context == AFTaskCountOfBytesReceivedContext) {
-                    [object removeObserver:self forKeyPath:@"countOfBytesReceived"];
+                    if (context == AFTaskCountOfBytesReceivedContext) {
+                        [object removeObserver:self forKeyPath:@"countOfBytesReceived"];
+                    }
                 }
+                @catch (NSException *exception) {}
             }
         }
     }
