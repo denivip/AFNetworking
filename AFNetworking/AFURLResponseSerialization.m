@@ -125,9 +125,7 @@ static NSString * AFStringFromIndexSet(NSIndexSet *indexSet) {
                            data:(NSData *)data
                           error:(NSError *__autoreleasing *)error
 {
-    if (![self validateResponse:(NSHTTPURLResponse *)response data:data error:error]) {
-        return nil;
-    }
+    [self validateResponse:(NSHTTPURLResponse *)response data:data error:error];
 
     return data;
 }
@@ -198,7 +196,9 @@ static NSString * AFStringFromIndexSet(NSIndexSet *indexSet) {
                           error:(NSError *__autoreleasing *)error
 {
     if (![self validateResponse:(NSHTTPURLResponse *)response data:data error:error]) {
-        return nil;
+        if ([(NSError *)(*error) code] == NSURLErrorCannotDecodeContentData) {
+            return nil;
+        }
     }
 
     // Workaround for behavior of Rails to return a single space for `head :ok` (a workaround for a bug in Safari), which is not interpreted as valid input by NSJSONSerialization.
@@ -285,6 +285,12 @@ static NSString * AFStringFromIndexSet(NSIndexSet *indexSet) {
                            data:(NSData *)data
                           error:(NSError *__autoreleasing *)error
 {
+    if (![self validateResponse:(NSHTTPURLResponse *)response data:data error:error]) {
+        if ([(NSError *)(*error) code] == NSURLErrorCannotDecodeContentData) {
+            return nil;
+        }
+    }
+
     return [[NSXMLParser alloc] initWithData:data];
 }
 
@@ -325,7 +331,9 @@ static NSString * AFStringFromIndexSet(NSIndexSet *indexSet) {
                           error:(NSError *__autoreleasing *)error
 {
     if (![self validateResponse:(NSHTTPURLResponse *)response data:data error:error]) {
-        return nil;
+        if ([(NSError *)(*error) code] == NSURLErrorCannotDecodeContentData) {
+            return nil;
+        }
     }
 
     return [[NSXMLDocument alloc] initWithData:data options:self.options error:error];
@@ -409,7 +417,9 @@ static NSString * AFStringFromIndexSet(NSIndexSet *indexSet) {
                           error:(NSError *__autoreleasing *)error
 {
     if (![self validateResponse:(NSHTTPURLResponse *)response data:data error:error]) {
-        return nil;
+        if ([(NSError *)(*error) code] == NSURLErrorCannotDecodeContentData) {
+            return nil;
+        }
     }
 
     return [NSPropertyListSerialization propertyListWithData:data options:self.readOptions format:nil error:error];
@@ -577,7 +587,9 @@ static UIImage * AFInflatedImageFromResponseWithDataAtScale(NSHTTPURLResponse *r
                           error:(NSError *__autoreleasing *)error
 {
     if (![self validateResponse:(NSHTTPURLResponse *)response data:data error:error]) {
-        return nil;
+        if ([(NSError *)(*error) code] == NSURLErrorCannotDecodeContentData) {
+            return nil;
+        }
     }
 
 #if defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
@@ -664,8 +676,9 @@ static UIImage * AFInflatedImageFromResponseWithDataAtScale(NSHTTPURLResponse *r
             continue;
         }
 
-        if ([(AFHTTPResponseSerializer *)serializer validateResponse:(NSHTTPURLResponse *)response data:data error:nil]) {
-            return [serializer responseObjectForResponse:response data:data error:error];
+        id responseObject = [serializer responseObjectForResponse:response data:data error:error];
+        if (responseObject) {
+            return responseObject;
         }
     }
     
