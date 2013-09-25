@@ -277,6 +277,8 @@ expectedTotalBytes:(int64_t)expectedTotalBytes {}
     self.operationQueue = [[NSOperationQueue alloc] init];
     self.operationQueue.maxConcurrentOperationCount = NSOperationQueueDefaultMaxConcurrentOperationCount;
 
+    self.responseSerializer = [AFJSONResponseSerializer serializer];
+
     self.sessionConfiguration = configuration;
     self.session = [NSURLSession sessionWithConfiguration:self.sessionConfiguration delegate:self delegateQueue:self.operationQueue];
 
