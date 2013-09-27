@@ -280,24 +280,24 @@ NSArray * AFQueryStringPairsFromKeyAndValue(NSString *key, id value) {
     NSParameterAssert(method);
     NSParameterAssert(![method isEqualToString:@"GET"] && ![method isEqualToString:@"HEAD"]);
 
-    NSMutableURLRequest *request = [self requestWithMethod:method URLString:URLString parameters:nil];
+    NSMutableURLRequest *request = [self requestWithMethod:method URLString:URLString parameters:parameters];
 
     __block AFStreamingMultipartFormData *formData = [[AFStreamingMultipartFormData alloc] initWithURLRequest:request stringEncoding:NSUTF8StringEncoding];
 
-    [parameters enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL * __unused stop) {
-        NSData *data = nil;
-        if ([obj isKindOfClass:[NSData class]]) {
-            data = obj;
-        } else if ([obj isEqual:[NSNull null]]) {
-            data = [NSData data];
-        } else {
-            data = [[obj description] dataUsingEncoding:NSUTF8StringEncoding];
-        }
-
-        if (data) {
-            [formData appendPartWithFormData:data name:[key description]];
-        }
-    }];
+//    [parameters enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL * __unused stop) {
+//        NSData *data = nil;
+//        if ([obj isKindOfClass:[NSData class]]) {
+//            data = obj;
+//        } else if ([obj isEqual:[NSNull null]]) {
+//            data = [NSData data];
+//        } else {
+//            data = [[obj description] dataUsingEncoding:NSUTF8StringEncoding];
+//        }
+//
+//        if (data) {
+//            [formData appendPartWithFormData:data name:[key description]];
+//        }
+//    }];
 
     if (block) {
         block(formData);
