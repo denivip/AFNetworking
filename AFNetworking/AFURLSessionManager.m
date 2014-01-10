@@ -445,6 +445,11 @@ expectedTotalBytes:(int64_t)expectedTotalBytes {
 {
     NSURLSessionUploadTask *uploadTask = [self.session uploadTaskWithRequest:request fromFile:fileURL];
 
+    if (! uploadTask) {
+        DVAssert(uploadTask, @"%@ %@ %@ %@ %i", self.session, request, [request URL], fileURL, [[NSFileManager defaultManager] fileExistsAtPath:[fileURL path]]);
+        return nil;
+    }
+
     return [self uploadTaskWithTask:uploadTask progress:progress completionHandler:completionHandler];
 }
 
