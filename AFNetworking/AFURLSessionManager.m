@@ -504,6 +504,20 @@ expectedTotalBytes:(int64_t)expectedTotalBytes {
 {
     NSURLSessionUploadTask *uploadTask = [self.session uploadTaskWithRequest:request fromFile:fileURL];
 
+    // This may be a bug in iOS. Devforums say that subsequent calls may succeed.
+    // Let's try to recreate the task.
+
+    NSInteger try = 3;
+    while (! uploadTask && try > 0) {
+        uploadTask = [self.session uploadTaskWithRequest:request fromFile:fileURL];
+        try--;
+    }
+
+    if (! uploadTask) {
+        DVAssert(uploadTask, @"%@ %@ %@ %@ %i", self.session, request, [request URL], fileURL, [[NSFileManager defaultManager] fileExistsAtPath:[fileURL path]]);
+        return nil;
+    }
+
     [self addDelegateForUploadTask:uploadTask progress:progress completionHandler:completionHandler];
 
     return uploadTask;
