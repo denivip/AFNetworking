@@ -222,7 +222,7 @@ didCompleteWithError:(NSError *)error
 {
     [self.mutableData appendData:data];
 
-    self.downloadProgress.totalUnitCount += [data length];
+    self.downloadProgress.completedUnitCount += (int64_t)[data length];
 }
 
 #pragma mark - NSURLSessionDownloadTaskDelegate
@@ -273,7 +273,6 @@ expectedTotalBytes:(int64_t)expectedTotalBytes {
 @property (readwrite, nonatomic, strong) NSOperationQueue *operationQueue;
 @property (readwrite, nonatomic, strong) NSURLSession *session;
 @property (readwrite, nonatomic, strong) NSMutableDictionary *mutableTaskDelegatesKeyedByTaskIdentifier;
-@property (readwrite, nonatomic, strong) AFNetworkReachabilityManager *reachabilityManager;
 @property (readwrite, nonatomic, strong) NSLock *lock;
 @property (readwrite, nonatomic, copy) AFURLSessionDidBecomeInvalidBlock sessionDidBecomeInvalid;
 @property (readwrite, nonatomic, copy) AFURLSessionDidReceiveAuthenticationChallengeBlock sessionDidReceiveAuthenticationChallenge;
@@ -349,6 +348,7 @@ expectedTotalBytes:(int64_t)expectedTotalBytes {
             forTask:(NSURLSessionTask *)task
 {
     NSParameterAssert(task);
+    NSParameterAssert(delegate);
 
     [self.lock lock];
     self.mutableTaskDelegatesKeyedByTaskIdentifier[@(task.taskIdentifier)] = delegate;
@@ -759,9 +759,9 @@ didCompleteWithError:(NSError *)error
         }
 
         [self removeDelegateForTask:task];
-    }
 
-    [task removeObserver:self forKeyPath:@"state" context:AFTaskStateChangedContext];
+        [task removeObserver:self forKeyPath:@"state" context:AFTaskStateChangedContext];
+    }
 }
 
 #pragma mark - NSURLSessionDataDelegate
@@ -787,10 +787,13 @@ didReceiveResponse:(NSURLResponse *)response
 didBecomeDownloadTask:(NSURLSessionDownloadTask *)downloadTask
 {
     AFURLSessionManagerTaskDelegate *delegate = [self delegateForTask:dataTask];
-    [self removeDelegateForTask:dataTask];
-    [dataTask removeObserver:self forKeyPath:@"state" context:AFTaskStateChangedContext];
+    if (delegate) {
+        [self removeDelegateForTask:dataTask];
+        [self setDelegate:delegate forTask:downloadTask];
 
-    [self setDelegate:delegate forTask:downloadTask];
+        [dataTask removeObserver:self forKeyPath:@"state" context:AFTaskStateChangedContext];
+    }
+
     [downloadTask addObserver:self forKeyPath:@"state" options:NSKeyValueObservingOptionOld|NSKeyValueObservingOptionNew context:AFTaskStateChangedContext];
 
     if (self.dataTaskDidBecomeDownloadTask) {
