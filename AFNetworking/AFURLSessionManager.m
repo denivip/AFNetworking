@@ -519,10 +519,18 @@ expectedTotalBytes:(int64_t)expectedTotalBytes {
         uploadTask = [self.session uploadTaskWithRequest:request fromFile:fileURL];
     });
 
+    // This may be a bug in iOS. Devforums say that subsequent calls may succeed.
+    // Let's try to recreate the task.
+
     if (!uploadTask && self.attemptsToRecreateUploadTasksForBackgroundSessions && self.session.configuration.identifier) {
         for (NSUInteger attempts = 0; !uploadTask && attempts < AFMaximumNumberOfAttemptsToRecreateBackgroundSessionUploadTask; attempts++) {
             uploadTask = [self.session uploadTaskWithRequest:request fromFile:fileURL];
         }
+    }
+
+    if (!uploadTask) {
+        DVAssert(uploadTask, @"%@ %@ %@ %@ %i", self.session, request, [request URL], fileURL, [[NSFileManager defaultManager] fileExistsAtPath:[fileURL path]]);
+        return nil;
     }
 
     [self addDelegateForUploadTask:uploadTask progress:progress completionHandler:completionHandler];
