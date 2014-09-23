@@ -351,7 +351,7 @@ forHTTPHeaderField:(NSString *)field
 //    NSMutableURLRequest *request = [self requestWithMethod:method URLString:URLString parameters:nil error:error];
     NSMutableURLRequest *request = [self requestWithMethod:method URLString:URLString parameters:parameters error:error];
 
-    __block AFStreamingMultipartFormData *formData = [[AFStreamingMultipartFormData alloc] initWithURLRequest:mutableRequest stringEncoding:NSUTF8StringEncoding];
+    __block AFStreamingMultipartFormData *formData = [[AFStreamingMultipartFormData alloc] initWithURLRequest:request stringEncoding:NSUTF8StringEncoding];
 
 //    if (parameters) {
 //        for (AFQueryStringPair *pair in AFQueryStringPairsFromDictionary(parameters)) {
