@@ -348,26 +348,27 @@ forHTTPHeaderField:(NSString *)field
     NSParameterAssert(method);
     NSParameterAssert(![method isEqualToString:@"GET"] && ![method isEqualToString:@"HEAD"]);
 
-    NSMutableURLRequest *mutableRequest = [self requestWithMethod:method URLString:URLString parameters:nil error:error];
+//    NSMutableURLRequest *request = [self requestWithMethod:method URLString:URLString parameters:nil error:error];
+    NSMutableURLRequest *request = [self requestWithMethod:method URLString:URLString parameters:parameters error:error];
 
     __block AFStreamingMultipartFormData *formData = [[AFStreamingMultipartFormData alloc] initWithURLRequest:mutableRequest stringEncoding:NSUTF8StringEncoding];
 
-    if (parameters) {
-        for (AFQueryStringPair *pair in AFQueryStringPairsFromDictionary(parameters)) {
-            NSData *data = nil;
-            if ([pair.value isKindOfClass:[NSData class]]) {
-                data = pair.value;
-            } else if ([pair.value isEqual:[NSNull null]]) {
-                data = [NSData data];
-            } else {
-                data = [[pair.value description] dataUsingEncoding:self.stringEncoding];
-            }
-
-            if (data) {
-                [formData appendPartWithFormData:data name:[pair.field description]];
-            }
-        }
-    }
+//    if (parameters) {
+//        for (AFQueryStringPair *pair in AFQueryStringPairsFromDictionary(parameters)) {
+//            NSData *data = nil;
+//            if ([pair.value isKindOfClass:[NSData class]]) {
+//                data = pair.value;
+//            } else if ([pair.value isEqual:[NSNull null]]) {
+//                data = [NSData data];
+//            } else {
+//                data = [[pair.value description] dataUsingEncoding:self.stringEncoding];
+//            }
+//
+//            if (data) {
+//                [formData appendPartWithFormData:data name:[pair.field description]];
+//            }
+//        }
+//    }
 
     if (block) {
         block(formData);
