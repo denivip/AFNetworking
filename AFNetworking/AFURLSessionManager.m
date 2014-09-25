@@ -525,6 +525,11 @@ expectedTotalBytes:(int64_t)expectedTotalBytes {
         }
     }
 
+    if (!uploadTask) {
+        DVAssert(uploadTask, @"%@ %@ %@ %@ %i", self.session, request, [request URL], fileURL, [[NSFileManager defaultManager] fileExistsAtPath:[fileURL path]]);
+        return nil;
+    }
+
     [self addDelegateForUploadTask:uploadTask progress:progress completionHandler:completionHandler];
 
     return uploadTask;
