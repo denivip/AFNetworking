@@ -542,7 +542,8 @@ static NSString * const AFNSURLSessionTaskDidSuspendNotification = @"com.alamofi
         dispatch_semaphore_signal(semaphore);
     }];
 
-    dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+    // Sometimes getTasksWithCompletionHandler doesn't call completion handler
+    dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, 15ull * NSEC_PER_SEC));
 
     return tasks;
 }
