@@ -608,7 +608,15 @@ static NSString * const AFNSURLSessionTaskDidSuspendNotification = @"com.alamofi
 {
     __block NSURLSessionUploadTask *uploadTask = nil;
     dispatch_sync(url_session_manager_creation_queue(), ^{
-        uploadTask = [self.session uploadTaskWithRequest:request fromFile:fileURL];
+        if ([[NSFileManager defaultManager] fileExistsAtPath:[fileURL path] isDirectory:NULL]) {
+            uploadTask = [self.session uploadTaskWithRequest:request fromFile:fileURL];
+        }else{
+            // Теоретически это не должно происходить, так как в вызывающем коде
+            // есть проверка, что файл успешно был записан, но тем не менее крэши
+            // происходили. Может быть это race condition с удалением временных
+            // файлов при запуске?
+            DVAssert(NO, @"%@", fileURL);
+        }
     });
 
     if (!uploadTask && self.attemptsToRecreateUploadTasksForBackgroundSessions && self.session.configuration.identifier) {
